@@ -6,7 +6,6 @@ from pennylane import numpy as np
 
 dev = qml.device("default.qubit", wires=2)
 
-
 @qml.qnode(dev)
 def superdense_coding(bits, alpha):
     """Construct a quantum circuit that implements superdense coding, given a not necessarily maximally entangled state
@@ -22,19 +21,42 @@ def superdense_coding(bits, alpha):
     # QHACK #
 
     # Prepare entangled state here
-
+    #state = [np.cos(alpha)*0.5,0,0,np.sin(alpha)*0.5]
+    #qml.BasisStatePreparation(state, wires=range(2))
+    
+    one = np.cos(alpha)
+    two = np.sin(alpha)
+    array = np.array([one*0.5, 0, 0, two*0.5])
+    newarray = np.linalg.norm(array)
+    array = array/newarray
+    #print(array)
+    
+    qml.QubitStateVector(array, wires=range(2))
+    #qml.Hadamard(wires=0)
+    #qml.CNOT(wires=[0,1])
+    
+    #return qml.probs(wires=[0, 1])
+    
     # Implement Alice's operations on her qubit here
-
+    if(bits == 1):
+        qml.PauliX(wires=0)
+    elif(bits == 2):
+        qml.PauliZ(wires=0)
+    elif(bits == 3):
+        qml.PauliX(wires=0)
+        qml.PauliZ(wires=0)
+    
     # Implement Bob's measurement procedure here
-
+    qml.CNOT(wires=[0,1])
+    qml.Hadamard(wires=0)
     # QHACK #
-
     return qml.probs(wires=[0, 1])
 
 
 def return_probs(bits, alpha):
     """Returns the output of the superdense_coding function for a given index (bits)"""
     # DO NOT MODIFY anything in this code block
+    #print(superdense_coding(bits, alpha))
     return superdense_coding(bits, alpha)[bits].numpy()
 
 
